@@ -1,14 +1,14 @@
 package com.saurs.talktome.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.saurs.talktome.models.enums.Gender;
-import com.saurs.talktome.models.enums.Mood;
-import com.saurs.talktome.models.enums.Reaction;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,10 +23,12 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name="TB_USER")
 public class User {
   
@@ -44,21 +46,20 @@ public class User {
   @OneToOne(cascade = CascadeType.DETACH)
   private User partner;
 
-  private Mood lastMood;
-  private Reaction lastReaction;
-
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "created_at", updatable=false)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss'Z'", timezone = "UTC")
   private LocalDateTime createdAt;
 
   @UpdateTimestamp
   @Temporal(TemporalType.TIMESTAMP)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss'Z'", timezone = "UTC")
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
   
   @OneToMany(mappedBy = "fromUser")
-  private List<AbstractPost> messages;
+  private List<Message> messages = new ArrayList<>();
 
   
 }

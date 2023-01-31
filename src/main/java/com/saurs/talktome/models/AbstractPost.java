@@ -5,49 +5,42 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.DiscriminatorType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name="POST_TYPE", 
-  discriminatorType = DiscriminatorType.STRING)
+@MappedSuperclass
 @Data
+@NoArgsConstructor
 public abstract class AbstractPost {
   
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
   private String title;
   private String text;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "from_user_id")
   private User fromUser;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "to_user_id")
   private User toUser;
 
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss'Z'", timezone = "UTC")
   @Column(name = "created_at", updatable=false)
   private LocalDateTime createdAt;
 
   @UpdateTimestamp
   @Temporal(TemporalType.TIMESTAMP)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss'Z'", timezone = "UTC")
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 }
