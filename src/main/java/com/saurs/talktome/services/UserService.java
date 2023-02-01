@@ -15,7 +15,7 @@ import com.saurs.talktome.models.User;
 import com.saurs.talktome.repositories.UserRepository;
 import com.saurs.talktome.services.exceptions.AlreadySetException;
 import com.saurs.talktome.services.exceptions.DatabaseException;
-import com.saurs.talktome.services.exceptions.ResourceNotFoundException;
+import com.saurs.talktome.services.exceptions.ObjectNotFoundException;
 import com.saurs.talktome.utils.ServiceUtils;
 
 @Service
@@ -30,7 +30,7 @@ public class UserService {
 
   public UserDTO findById(Long id) {
     Optional<UserDTO> getUser = repository.findById(id).map(UserDTO::converter);
-    return getUser.orElseThrow(() -> new ResourceNotFoundException(id));
+    return getUser.orElseThrow(() -> new ObjectNotFoundException(id));
   }
 
   public User addUser(User obj) {
@@ -39,31 +39,34 @@ public class UserService {
 
   public User updateUser(User obj, Long id) {
     Optional<User> oldUser = repository.findById(id);
-    BeanUtils.copyProperties(obj, oldUser.orElseThrow(() -> new ResourceNotFoundException(id)), ServiceUtils.getNullPropertyNames(obj));
+    BeanUtils.copyProperties(obj, oldUser.orElseThrow(() -> new ObjectNotFoundException(id)), ServiceUtils.getNullPropertyNames(obj));
     return repository.save(oldUser.get());
   }
 
-  public List<User> setPartner(Long userId, Long partnerId) {
-    User user = repository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(userId));
-    User partner = repository.findById(partnerId).orElseThrow(() -> new ResourceNotFoundException(partnerId));
+  public void setPartner(Long userId, Long partnerId) {
+    User user = repository.findById(userId).orElseThrow(() -> new ObjectNotFoundException(userId));
+    User partner = repository.findById(partnerId).orElseThrow(() -> new ObjectNotFoundException(partnerId));
     if (user.getPartner() != null || partner.getPartner() != null) {
-      throw new AlreadySetException();
+      throw new AlreadySetException("User already have a partner. Make sure you remove the partner before trying to set a new one.");
     }
     user.setPartner(partner);
     partner.setPartner(user);
-    return repository.saveAll(Arrays.asList(user, partner));
+    repository.saveAll(Arrays.asList(user, partner));
   }
 
-  public User removePartner(Long userId) {
-    User user = repository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(userId));
+  public void removePartner(Long userId) {
+    User user = repository.findById(userId).orElseThrow(() -> new ObjectNotFoundException(userId));
+    if (user.getPartner() == null) {
+      throw new AlreadySetException("User doesn't have a partner to remove.");
+    }
     user.getPartner().setPartner(null);
     user.setPartner(null);
-    return repository.save(user);
+    repository.save(user);
   }
 
   public void deleteUser(Long id) {
     try {
-      User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+      User user = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException(id));
       if (user.getPartner() != null) {
         removePartner(id);
       }

@@ -21,7 +21,7 @@ import com.saurs.talktome.models.User;
 import com.saurs.talktome.services.UserService;
 
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/api/users")
 public class UserController {
   
   @Autowired
@@ -60,16 +60,16 @@ public class UserController {
     return ResponseEntity.ok().body(updatedUser);
   }
 
-  @PatchMapping("/{userId}/partner/{partnerId}")
-  public ResponseEntity<List<User>> setUserPartner(@PathVariable Long userId, @PathVariable Long partnerId) {
-    List<User> userAndPartner = service.setPartner(userId, partnerId);
-    return ResponseEntity.ok().body(userAndPartner);
+  @PatchMapping("/{userId}/partner-with/{partnerId}")
+  public ResponseEntity<Void> setUserPartner(@PathVariable Long userId, @PathVariable Long partnerId) {
+    service.setPartner(userId, partnerId);
+    return ResponseEntity.ok().build();
   }
 
-  @PatchMapping("/removePartner/{id}")
-  public ResponseEntity<User> removeUserPartner(@PathVariable Long id) {
-    User user = service.removePartner(id);
-    return ResponseEntity.ok().body(user);
+  @PatchMapping("/{id}/remove-partner")
+  public ResponseEntity<Void> removeUserPartner(@PathVariable Long id) {
+    service.removePartner(id);
+    return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/{id}")

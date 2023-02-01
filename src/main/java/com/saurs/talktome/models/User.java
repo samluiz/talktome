@@ -58,8 +58,7 @@ public class User {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
   
-  @OneToMany(mappedBy = "fromUser")
+  @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL)
   private List<Message> messages = new ArrayList<>();
-
   
 }

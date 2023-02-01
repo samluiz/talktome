@@ -12,9 +12,10 @@ public class WebConfigSecurity {
   
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests((authz) -> authz.anyRequest().permitAll())
+    http.authorizeHttpRequests()
+    .anyRequest().authenticated()
+    .and()
     .csrf().disable()
-    .securityMatcher("error/**")
     .httpBasic();
 
     return http.build();
