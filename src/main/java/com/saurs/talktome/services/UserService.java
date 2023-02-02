@@ -9,6 +9,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.saurs.talktome.dtos.UserDTO;
@@ -24,6 +26,9 @@ public class UserService {
   @Autowired
   private UserRepository repository;
 
+  private PasswordEncoder delegateEncoder =
+          PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
   public List<UserDTO> findAll(Pageable pageable) {
     return repository.findAll(pageable).stream().map(UserDTO::converter).collect(Collectors.toList());
   }
@@ -34,6 +39,7 @@ public class UserService {
   }
 
   public User addUser(User obj) {
+    obj.setPassword(delegateEncoder.encode(obj.getPassword()));
     return repository.save(obj);
   }
 
