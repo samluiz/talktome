@@ -1,10 +1,12 @@
 package com.saurs.talktome.models;
 
-import com.saurs.talktome.models.enums.Reaction;
+import com.saurs.talktome.models.enums.Mood;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -13,25 +15,28 @@ import java.util.Objects;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="TB_REPLY")
-public class Reply extends AbstractPost {
-
+@Table(name="TB_POST")
+public class Post extends AbstractPost {
+  
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private Mood mood;
 
-  private Reaction reaction;
+  @OneToMany(mappedBy = "replyTo", cascade = CascadeType.REMOVE)
+  @ToString.Exclude
+  private List<Reply> replies = new ArrayList<>();
 
-  @ManyToOne
-  @JoinColumn(name = "reply_to")
-  private Post replyTo;
+  public void clearReplies() {
+    this.replies.clear();
+  }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Reply reply = (Reply) o;
-    return id != null && Objects.equals(id, reply.id);
+    Post post = (Post) o;
+    return id != null && Objects.equals(id, post.id);
   }
 
   @Override
@@ -39,4 +44,3 @@ public class Reply extends AbstractPost {
     return getClass().hashCode();
   }
 }
-

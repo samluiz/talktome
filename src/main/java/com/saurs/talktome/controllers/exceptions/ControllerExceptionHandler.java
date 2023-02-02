@@ -7,10 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.saurs.talktome.services.exceptions.AlreadySetException;
 import com.saurs.talktome.services.exceptions.DatabaseException;
 import com.saurs.talktome.services.exceptions.ObjectNotFoundException;
-import com.saurs.talktome.services.exceptions.UserIsNotPartnerException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -41,25 +39,4 @@ public class ControllerExceptionHandler {
     return ResponseEntity.status(status).body(err);
   }
 
-  @ExceptionHandler(AlreadySetException.class)
-  public ResponseEntity<StandardError> alreadySet(AlreadySetException e, HttpServletRequest request) {
-    String error = "Partner field error";
-
-    HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-    
-    StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
-
-    return ResponseEntity.status(status).body(err);
-  }
-
-  @ExceptionHandler(UserIsNotPartnerException.class)
-  public ResponseEntity<StandardError> notPartner(UserIsNotPartnerException e, HttpServletRequest request) {
-    String error = "User is not partner";
-
-    HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-    
-    StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
-
-    return ResponseEntity.status(status).body(err);
-  }
 }

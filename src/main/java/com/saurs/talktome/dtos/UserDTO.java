@@ -20,8 +20,7 @@ public class UserDTO {
   private String firstName;
   private String lastName;
   private Gender gender;
-  private Long partnerId;
-  private List<MessageDTO> messages;
+  private List<PostDTO> posts;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss'Z'", timezone = "UTC")
   private LocalDateTime createdAt;

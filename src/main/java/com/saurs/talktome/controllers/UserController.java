@@ -4,16 +4,9 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.saurs.talktome.dtos.UserDTO;
@@ -28,8 +21,9 @@ public class UserController {
   private UserService service;
 
   @GetMapping
-  public ResponseEntity<List<UserDTO>> getAllUsers() {
-    List<UserDTO> users = service.findAll();
+  public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                   @RequestParam(value = "size", defaultValue = "20") Integer size) {
+    List<UserDTO> users = service.findAll(PageRequest.of(page, size));
     return ResponseEntity.ok().body(users);
   }
 
@@ -58,18 +52,6 @@ public class UserController {
   public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id) {
     User updatedUser = service.updateUser(user, id);
     return ResponseEntity.ok().body(updatedUser);
-  }
-
-  @PatchMapping("/{userId}/partner-with/{partnerId}")
-  public ResponseEntity<Void> setUserPartner(@PathVariable Long userId, @PathVariable Long partnerId) {
-    service.setPartner(userId, partnerId);
-    return ResponseEntity.ok().build();
-  }
-
-  @PatchMapping("/{id}/remove-partner")
-  public ResponseEntity<Void> removeUserPartner(@PathVariable Long id) {
-    service.removePartner(id);
-    return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/{id}")

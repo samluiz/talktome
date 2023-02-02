@@ -1,9 +1,9 @@
 package com.saurs.talktome.models.enums;
 
 public enum Reaction {
-  SORRY,
-  EMBARRASSED,
+  SAD,
+  ANGRY,
   NEUTRAL,
-  UNDERSTANDING,
-  FORGIVING
+  FUNNY,
+  LOVE
 }

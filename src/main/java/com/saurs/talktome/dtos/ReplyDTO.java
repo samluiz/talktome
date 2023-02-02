@@ -20,8 +20,7 @@ public class ReplyDTO {
   private Long id;
   private String title;
   private String text;
-  private Long fromUserId;
-  private Long toUserId;
+  private Long authorId;
   private Long replyToId;
   private Reaction reaction;
 
