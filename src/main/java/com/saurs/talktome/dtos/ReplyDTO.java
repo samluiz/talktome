@@ -2,6 +2,7 @@ package com.saurs.talktome.dtos;
 
 import java.time.LocalDateTime;
 
+import com.saurs.talktome.models.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.modelmapper.ModelMapper;
@@ -39,5 +40,10 @@ public class ReplyDTO {
   public static ReplyDTO converter(Reply m) {
     ModelMapper modelMapper = new ModelMapper();
     return modelMapper.map(m, ReplyDTO.class);
+  }
+
+  public static Reply converterToEntity(ReplyDTO dto) {
+    ModelMapper modelMapper = new ModelMapper();
+    return modelMapper.map(dto, Reply.class);
   }
 }

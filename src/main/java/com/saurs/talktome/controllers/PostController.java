@@ -15,7 +15,7 @@ import com.saurs.talktome.repositories.PostRepository;
 import com.saurs.talktome.services.PostService;
 
 @RestController
-@RequestMapping(value = "/api/posts")
+@RequestMapping(value = "/posts")
 public class PostController {
   
   @Autowired
@@ -26,7 +26,7 @@ public class PostController {
 
   @GetMapping
   public ResponseEntity<List<PostDTO>> getAllPosts(@RequestParam(value = "page", defaultValue = "0") Integer page,
-                                                      @RequestParam(value = "size", defaultValue = "20") Integer size) {
+                                                   @RequestParam(value = "size", defaultValue = "20") Integer size) {
     List<PostDTO> posts = service.findAll(PageRequest.of(page, size));
     return ResponseEntity.ok().body(posts);
   }
@@ -40,16 +40,18 @@ public class PostController {
      return ResponseEntity.ok().body(post);
   }
 
-  @GetMapping("/sent/user/{userId}")
-  public ResponseEntity<List<PostDTO>> getPostsFromUser(@PathVariable Long userId,
-                                                           @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                                           @RequestParam(value = "size", defaultValue = "20") Integer size) {
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<List<PostDTO>> getPostsFromUser(
+          @PathVariable Long userId,
+          @RequestParam(value = "page", defaultValue = "0") Integer page,
+          @RequestParam(value = "size", defaultValue = "20") Integer size) {
     List<PostDTO> posts = service.findAllByAuthor(userId, PageRequest.of(page, size));
      return ResponseEntity.ok().body(posts);
   }
 
-  @PostMapping("/user/{userId}/post")
-  public ResponseEntity<PostDTO> createPost(@RequestBody Post post, @PathVariable Long userId) {
+  @PostMapping("/new")
+  public ResponseEntity<PostDTO> createPost(@RequestBody Post post) {
+    // TODO get authenticated user
     Post newPost = service.addPost(post, userId);
     URI uri = ServletUriComponentsBuilder
     .fromCurrentRequest()
@@ -57,21 +59,22 @@ public class PostController {
     .buildAndExpand(newPost.getId())
     .toUri();
 
-    PostDTO msgDto = repository.findById(newPost.getId()).map(PostDTO::converter).get();
+    PostDTO postDto = repository.findById(newPost.getId()).map(PostDTO::converter).get();
 
-    return ResponseEntity.created(uri).body(msgDto);
+    return ResponseEntity.created(uri).body(postDto);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<PostDTO> updatePost(@RequestBody Post post, @PathVariable Long id) {
+    // TODO get authenticated user and check if it's him
     Post updatedPost = service.updatePost(post, id);
-
-    PostDTO msgDto = repository.findById(updatedPost.getId()).map(PostDTO::converter).get();
-    return ResponseEntity.ok().body(msgDto);
+    PostDTO postDto = repository.findById(updatedPost.getId()).map(PostDTO::converter).get();
+    return ResponseEntity.ok().body(postDto);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+    // TODO get authenticated user and check if it's him
     service.deletePost(id);
     return ResponseEntity.noContent().build();
   }

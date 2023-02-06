@@ -30,7 +30,10 @@ public class UserService {
           PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
   public List<UserDTO> findAll(Pageable pageable) {
-    return repository.findAll(pageable).stream().map(UserDTO::converter).collect(Collectors.toList());
+    return repository.findAll(pageable)
+            .stream()
+            .map(UserDTO::converter)
+            .collect(Collectors.toList());
   }
 
   public UserDTO findById(Long id) {
@@ -44,12 +47,16 @@ public class UserService {
   }
 
   public User updateUser(User obj, Long id) {
+    // TODO get authenticated user and check if it's him
     Optional<User> oldUser = repository.findById(id);
-    BeanUtils.copyProperties(obj, oldUser.orElseThrow(() -> new ObjectNotFoundException(id)), ServiceUtils.getNullPropertyNames(obj));
+    BeanUtils.copyProperties(obj, oldUser.orElseThrow(
+            () -> new ObjectNotFoundException(id)),
+            ServiceUtils.getNullPropertyNames(obj));
     return repository.save(oldUser.get());
   }
 
   public void deleteUser(Long id) {
+    // TODO get authenticated user and check if it's him
     try {
       User user = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException(id));
       repository.deleteById(id);

@@ -22,7 +22,12 @@ public class ControllerExceptionHandler {
 
     HttpStatus status = HttpStatus.NOT_FOUND;
 
-    StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+    StandardError err = new StandardError(
+            Instant.now(),
+            status.value(),
+            error,
+            e.getMessage(),
+            request.getRequestURI());
 
     return ResponseEntity.status(status).body(err);
   }

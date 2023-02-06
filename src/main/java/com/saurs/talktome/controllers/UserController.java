@@ -14,7 +14,7 @@ import com.saurs.talktome.models.User;
 import com.saurs.talktome.services.UserService;
 
 @RestController
-@RequestMapping(value = "/api/users")
+@RequestMapping(value = "/users")
 public class UserController {
   
   @Autowired
