@@ -1,33 +1,26 @@
 package com.saurs.talktome.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.saurs.talktome.models.Post;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.saurs.talktome.dtos.UserDTO;
 import com.saurs.talktome.models.User;
 import com.saurs.talktome.repositories.UserRepository;
 import com.saurs.talktome.services.exceptions.DatabaseException;
 import com.saurs.talktome.services.exceptions.ObjectNotFoundException;
 import com.saurs.talktome.utils.ServiceUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
   @Autowired
   private UserRepository repository;
-
-  private PasswordEncoder delegateEncoder =
-          PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
   public List<UserDTO> findAll(Pageable pageable) {
     return repository.findAll(pageable)
@@ -41,13 +34,7 @@ public class UserService {
     return getUser.orElseThrow(() -> new ObjectNotFoundException(id));
   }
 
-  public User addUser(User obj) {
-    obj.setPassword(delegateEncoder.encode(obj.getPassword()));
-    return repository.save(obj);
-  }
-
   public User updateUser(User obj, Long id) {
-    // TODO get authenticated user and check if it's him
     Optional<User> oldUser = repository.findById(id);
     BeanUtils.copyProperties(obj, oldUser.orElseThrow(
             () -> new ObjectNotFoundException(id)),
@@ -56,9 +43,10 @@ public class UserService {
   }
 
   public void deleteUser(Long id) {
-    // TODO get authenticated user and check if it's him
+
     try {
       User user = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException(id));
+      user.getRoles().clear();
       repository.deleteById(id);
     } catch (DataIntegrityViolationException e) {
         throw new DatabaseException(e.getMessage());

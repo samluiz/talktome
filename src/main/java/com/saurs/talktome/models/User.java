@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -16,9 +18,10 @@ import java.util.*;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name="TB_USER")
-public class User {
-  
+public class User implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -55,8 +58,36 @@ public class User {
     this.posts.clear();
   }
 
-  public boolean repeatedEmail(String email) {
-    return this.email.equals(email);
+  @Setter(AccessLevel.NONE)
+  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+  @JoinTable(name = "user_roles",
+          joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+          inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+  private Set<Role> roles;
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return roles;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
   }
 
   @Override
@@ -71,4 +102,5 @@ public class User {
   public int hashCode() {
     return getClass().hashCode();
   }
+
 }

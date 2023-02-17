@@ -15,7 +15,7 @@ public class ServiceUtils {
     Set<String> emptyNames = new HashSet<>();
     for (java.beans.PropertyDescriptor pd : pds) {
       Object srcValue = src.getPropertyValue(pd.getName());
-      if (srcValue == null) emptyNames.add(pd.getName());
+      if (srcValue == null || pd.getName().contains("id")) emptyNames.add(pd.getName());
     }
     String[] result = new String[emptyNames.size()];
     return emptyNames.toArray(result);
