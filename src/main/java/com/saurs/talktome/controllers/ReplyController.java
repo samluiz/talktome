@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.security.Principal;
 import java.util.List;
-
-import static com.saurs.talktome.utils.ControllerUtils.getAuthenticatedUser;
 
 @RestController
 @RequestMapping(value = "/replies")

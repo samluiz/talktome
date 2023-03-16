@@ -8,18 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.saurs.talktome.utils.ControllerUtils.getAuthenticatedUser;
-
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/user")
 public class UserController {
 
   @Autowired
@@ -44,23 +40,17 @@ public class UserController {
      return ResponseEntity.ok().body(user);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<UserDTO> updateUser(@RequestBody User user, @PathVariable Long id, @AuthenticationPrincipal UserDetails activeUser) {
-    Long userId = repository.findByUsername(activeUser.getUsername()).get().getId();
-    if (userId.equals(id)) {
+  @PutMapping("/update")
+  public ResponseEntity<UserDTO> updateUser(@RequestBody User user, @AuthenticationPrincipal UserDetails activeUser) {
+      Long id = repository.findByUsername(activeUser.getUsername()).get().getId();
       UserDTO updatedUser = UserDTO.converter(service.updateUser(user, id));
       return ResponseEntity.ok().body(updatedUser);
-    }
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteUser(@PathVariable Long id, @AuthenticationPrincipal User activeUser) {
-    Long userId = repository.findByUsername(activeUser.getUsername()).get().getId();
-    if (userId.equals(id)) {
+  @DeleteMapping("/delete")
+  public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal User activeUser) {
+      Long id = repository.findByUsername(activeUser.getUsername()).get().getId();
       service.deleteUser(id);
       return ResponseEntity.noContent().build();
-    }
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
   }
 }
